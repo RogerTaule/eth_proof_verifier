@@ -11,15 +11,9 @@ use sp1_recursion_executor::{RECURSIVE_PROOF_NUM_PV_ELTS, RecursionPublicValues}
 use sp1_verifier::{ProofFromNetwork, compressed::SP1CompressedVerifier};
 
 use crate::{
-    backend::{InvalidProgramVk, ProofVerifier, Rejection},
+    backend::{InvalidProgramVk, ProofVerifier, Rejection, decode_legacy},
     registry::PROGRAM_VK_LEN,
 };
-
-/// Ceiling on what a length prefix inside a proof can allocate.
-///
-/// A guard, not a size bound. bincode counts an in-memory claim, which can exceed the wire size, so
-/// `MAX_PROOF_SIZE` here would refuse proofs the spec admits. `ere` uses 64 MiB too.
-const MAX_DECODE_BYTES: usize = 64 * 1024 * 1024;
 
 /// Limbs the packed verifying key is held in.
 const PROGRAM_VK_LIMBS: usize = PROGRAM_VK_LEN / 8;
@@ -48,14 +42,7 @@ impl Sp1Verifier {
 
 impl ProofVerifier for Sp1Verifier {
     fn verify(&self, proof_bytes: &[u8]) -> Result<Vec<u8>, Rejection> {
-        let (proof, consumed): (ProofFromNetwork, usize) = bincode::serde::decode_from_slice(
-            proof_bytes,
-            bincode::config::legacy().with_limit::<MAX_DECODE_BYTES>(),
-        )
-        .map_err(Rejection::malformed)?;
-        if consumed != proof_bytes.len() {
-            return Err(Rejection::malformed("trailing bytes after the proof"));
-        }
+        let proof: ProofFromNetwork = decode_legacy(proof_bytes)?;
 
         let compressed = proof.proof.try_as_compressed_ref().ok_or_else(|| {
             Rejection::malformed(format!(

@@ -22,9 +22,11 @@ Immutable `(system, guest, version)` triples. `--proof-types FILE` adds more.
 | --- | --- | --- |
 | 1 | reth 0.1.0-rc.3 | SP1 6.4.0 |
 | 2 | ethrex 27.0.0 | SP1 6.4.0 |
+| 3 | reth 0.1.0-rc.4 | ZisK 1.2.0-alpha |
+| 4 | ethrex 29.0.0 | ZisK 1.2.0-alpha |
 
 ## Adding a proving system
 
-PRs welcome: implement `ProofVerifier::verify`, add a row. See `src/backend/sp1.rs`, ~130 lines. Bring a crates.io verifier at a pinned version, a published verifying key per guest, and a real proof as a fixture. ZisK and OpenVM wait on exactly that.
+PRs welcome: implement `ProofVerifier::verify`, add a row. See `src/backend/sp1.rs` or `src/backend/zisk.rs`, ~130 lines each. Bring a crates.io verifier at a pinned version, a published verifying key per guest, and a real proof as a fixture. OpenVM waits on exactly that.
 
 Apache-2.0 OR MIT. Guests, keys and fixture from [ere](https://github.com/eth-act/ere).

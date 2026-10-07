@@ -216,7 +216,7 @@ mod tests {
     use tower::ServiceExt;
 
     /// Stands in for a proof system, so each case needs no proof. The cryptography is covered in
-    /// `tests/sp1_verifier.rs`.
+    /// `tests/sp1` and `tests/zisk`.
     struct Stub(Result<Vec<u8>, &'static str>);
 
     impl ProofVerifier for Stub {
@@ -228,8 +228,8 @@ mod tests {
     fn spec(proof_type: u8) -> ProofTypeSpec {
         ProofTypeSpec {
             proof_type,
-            proof_system: ProofSystem::Sp1,
-            proof_system_version: "6.4.0".to_owned(),
+            proof_system: ProofSystem::Zisk,
+            proof_system_version: "1.2.0-alpha".to_owned(),
             guest: "stub".to_owned(),
             guest_version: "1".to_owned(),
             program_vk: "00".repeat(32),

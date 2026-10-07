@@ -8,9 +8,12 @@
 # further values to be socialised out of band. These assignments are therefore ours, and a `--proof-types`
 # file overrides or extends them by proof type number.
 #
-# Guest programs and their verifying keys come from eth-act/ere-guests v0.17.1. A verifying key is
-# tied to the guest build, so `proof_system_version` records the version the guest was compiled and
-# proved with. It is not the verifier's own version: one pinned verifier reads several of these.
+# A verifying key is tied to the guest build, so `proof_system_version` records the version the
+# guest was compiled and proved with. For SP1 it is not the verifier's own version: one pinned
+# verifier reads several of these. ZisK's aggregation key changes with every release, so for ZisK it
+# must be the version this binary pins.
+#
+# SP1 guests and keys come from eth-act/ere-guests v0.17.1, ZisK ones from v0.18.0.
 
 [[proof_types]]
 proof_type = 1
@@ -27,3 +30,19 @@ proof_system_version = "6.4.0"
 guest = "ethrex"
 guest_version = "27.0.0"
 program_vk = "00f4d73c54dd9f0ae100b9736e80804cd03ba7e5093127d83ef4ca616ee8d8d3"
+
+[[proof_types]]
+proof_type = 3
+proof_system = "zisk"
+proof_system_version = "1.2.0-alpha"
+guest = "reth"
+guest_version = "0.1.0-rc.4"
+program_vk = "a4c7e4fbff2c8aa974fbeec51e72afc5b102e0563d22abccf70e60036e044c50"
+
+[[proof_types]]
+proof_type = 4
+proof_system = "zisk"
+proof_system_version = "1.2.0-alpha"
+guest = "ethrex"
+guest_version = "29.0.0"
+program_vk = "a898e3b2614a319c401e7218ab8a1b6654fc414c86e44f995e028429d3cbb1f2"

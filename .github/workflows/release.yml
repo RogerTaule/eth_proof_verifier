@@ -42,7 +42,7 @@ jobs:
           targets: ${{ matrix.target }}
       - uses: Swatinem/rust-cache@v2
 
-      # Locked, because the SP1 pins are exact on purpose and a release should be the build that
+      # Locked, because the SP1 and ZisK pins are exact on purpose and a release should be the build that
       # was tested.
       - run: cargo test --release --locked
       - run: cargo build --release --locked --target ${{ matrix.target }}

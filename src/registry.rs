@@ -213,7 +213,7 @@ impl Display for ProofTypeSpec {
 mod tests {
     use super::*;
 
-    const FIXTURE_VK: &str = "002d67597a7afdbb45a24a311ea77a6b07ccdebab8b92db5a95fe8371beed380";
+    const FIXTURE_VK: &str = "5b1d9c47bc0c4ed29d0672622345069aa47e9b39a489b9d5c11cac9cc66236e3";
 
     fn load_from(contents: &str) -> Result<Registry, LoadError> {
         let path = std::env::temp_dir().join(format!(
@@ -231,8 +231,8 @@ mod tests {
         format!(
             "[[proof_types]]\n\
              proof_type = {proof_type}\n\
-             proof_system = \"sp1\"\n\
-             proof_system_version = \"6.4.0\"\n\
+             proof_system = \"zisk\"\n\
+             proof_system_version = \"1.2.0-alpha\"\n\
              guest = \"guest\"\n\
              guest_version = \"1\"\n\
              program_vk = \"{program_vk}\"\n"
@@ -243,7 +243,7 @@ mod tests {
     #[test]
     fn default_proof_types_load() {
         let registry = Registry::load(None).expect("defaults load");
-        assert_eq!(registry.supported(), vec![1, 2]);
+        assert_eq!(registry.supported(), vec![1, 2, 3, 4]);
         for proof_type in registry.supported() {
             assert!(registry.verifier(proof_type).is_some());
         }
@@ -251,8 +251,8 @@ mod tests {
 
     #[test]
     fn serves_an_added_proof_type() {
-        let registry = load_from(&entry(3, FIXTURE_VK)).expect("loads");
-        assert_eq!(registry.supported(), vec![1, 2, 3]);
+        let registry = load_from(&entry(5, FIXTURE_VK)).expect("loads");
+        assert_eq!(registry.supported(), vec![1, 2, 3, 4, 5]);
     }
 
     /// This used to parse as an empty file, and the operator's proof type was silently absent.
@@ -265,7 +265,7 @@ mod tests {
 
     #[test]
     fn rejects_an_unknown_field() {
-        let extra = format!("{}proof_sytsem = \"sp1\"\n", entry(3, FIXTURE_VK));
+        let extra = format!("{}proof_sytsem = \"zisk\"\n", entry(3, FIXTURE_VK));
         assert!(load_from(&extra).is_err());
     }
 

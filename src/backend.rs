@@ -4,10 +4,30 @@
 //! right public input is decided in [`crate::public_input`].
 
 pub mod sp1;
+pub mod zisk;
 
 use std::fmt::Display;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, de::DeserializeOwned};
+
+/// Ceiling on what a length prefix inside a proof can allocate.
+///
+/// A guard, not a size bound. bincode counts an in-memory claim, which can exceed the wire size, so
+/// `MAX_PROOF_SIZE` here would refuse proofs the spec admits. `ere` uses 64 MiB too.
+const MAX_DECODE_BYTES: usize = 64 * 1024 * 1024;
+
+/// Decode a proof in bincode's legacy encoding, which `ere`'s provers write, with nothing left over.
+fn decode_legacy<T: DeserializeOwned>(bytes: &[u8]) -> Result<T, Rejection> {
+    let (value, consumed) = bincode::serde::decode_from_slice(
+        bytes,
+        bincode::config::legacy().with_limit::<MAX_DECODE_BYTES>(),
+    )
+    .map_err(Rejection::malformed)?;
+    if consumed != bytes.len() {
+        return Err(Rejection::malformed("trailing bytes after the proof"));
+    }
+    Ok(value)
+}
 
 /// A verifier bound to one compiled guest program.
 pub trait ProofVerifier: Send + Sync + 'static {
@@ -53,12 +73,14 @@ impl InvalidProgramVk {
 #[serde(rename_all = "lowercase")]
 pub enum ProofSystem {
     Sp1,
+    Zisk,
 }
 
 impl ProofSystem {
     pub fn name(self) -> &'static str {
         match self {
             Self::Sp1 => "sp1",
+            Self::Zisk => "zisk",
         }
     }
 
@@ -69,6 +91,7 @@ impl ProofSystem {
     pub fn verifier(self, program_vk: &[u8]) -> Result<Box<dyn ProofVerifier>, InvalidProgramVk> {
         match self {
             Self::Sp1 => Ok(Box::new(sp1::Sp1Verifier::new(program_vk)?)),
+            Self::Zisk => Ok(Box::new(zisk::ZiskVerifier::new(program_vk)?)),
         }
     }
 }
